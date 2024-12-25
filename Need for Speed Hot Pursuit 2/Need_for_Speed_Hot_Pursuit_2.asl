@@ -4,19 +4,14 @@ state("NFSHP2")
     // 0 = Loading, 91 = Event tree, 101 = Event tree popup
     int gameState : "NFSHP2.exe", 0x0044BCB0;
 
-    // Indicates state of current Hot Pursuit event
+    // Indicates state of current event
     // 0 = Event ongoing, 1 = Crossed finish line (race event) or timer ran out (cop event)
-    byte hpEventState : "NFSHP2.exe", 0x00303080, 0x00000020, 0x0000070C;
-
-    // Indicates state of current Championship event
-    // 0 = Event ongoing, 1 = Crossed finish line
-    byte cEventState : "NFSHP2.exe", 0x002E27A0, 0x00001F34, 0x00000254;
+    byte eventState : "NFSHP2.exe", 0x002E27A0, 0x00001F34, 0x00000254;
 
     // Indicates if player got busted
     // true = Player got busted
     bool playerBusted : "NFSHP2.exe", 0x003F0D5C;
 }
-
 
 start
 {
@@ -30,14 +25,10 @@ start
 }
 
 
-split 
+split
 {
-    // Split when Hot Pursuit event is completed
-    if (old.hpEventState == 0 && current.hpEventState == 1) 
-        return true;
-
-    // Split when Championship event is completed
-    if (old.cEventState == 0 && current.cEventState == 1) 
+    // Split when event is completed
+    if (old.eventState == 0 && current.eventState == 1 && !current.playerBusted) 
         return true;
 
     // Split when player got busted
